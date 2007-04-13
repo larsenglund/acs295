@@ -15,26 +15,25 @@
 #include <util/delay.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #ifdef DEBUG
-#include <avr/io.h>
-#endif
+	#include <avr/io.h>
 
-
-#ifndef UCSRB
-# ifdef UCSR1A		// ATmega128
-#  define UCSRA UCSR1A
-#  define UCSRB UCSR1B
-#  define UBRR UBRR1L
-#  define UDR UDR1
-# else				// ATmega8
-#  define UCSRA USR
-#  define UCSRB UCR
-# endif
+	#ifndef UCSRB
+		#ifdef UCSR1A		// ATmega128
+			#define UCSRA UCSR1A
+			#define UCSRB UCSR1B
+			#define UBRR UBRR1L
+			#define UDR UDR1
+		#else				// ATmega8
+			#define UCSRA USR
+			#define UCSRB UCR
+		#endif
+	#endif
+	#ifndef UBRR
+		#define UBRR UBRRL
+	#endif
 #endif
-#ifndef UBRR
-#  define UBRR UBRRL
-#endif
-
 
 #define TWI_SLA_TDA7433	0x8a
 #define TWI_SCL			PC1		// Output	
@@ -52,6 +51,7 @@
 
 void ioinit(void)
 {
+#ifdef DEBUG
 #if F_CPU <= 1000000UL
   UCSRA = _BV(U2X);						// Slow system clock, double baud rate to improve rate error.
   UBRR = (F_CPU / (8 * 9600UL)) - 1;	// 9600 baud
@@ -59,6 +59,7 @@ void ioinit(void)
   UBRR = (F_CPU / (16 * 9600UL)) - 1;	// 9600 baud
 #endif
   UCSRB = _BV(TXEN);					// tx enable
+#endif
 
   TWI_DDR_PORT = _BV(TWI_SDA) | _BV(TWI_SCL);
 }
@@ -88,7 +89,7 @@ void twi_stop()
 }
 
 void twi_write(uint8_t d) {
-	uint8_t n, c;
+	uint8_t n;
 
 	for (n=8; n; n--) {
 		if (d & 0x80) {
@@ -105,7 +106,7 @@ void twi_write(uint8_t d) {
 	}
 	twi_high(TWI_SDA);
 	twi_delay();
-	// Uncomment all comments below in this function to print I2C ACK:s
+	// Uncomment all comments below in this function to print I2C ACK:s (and #define DEBUG in makefile)
 	//TWI_DDR_PORT = _BV(TWI_SCL);
 	//printf("SDA: %d\n", PINC);
 	twi_high(TWI_SCL);
@@ -117,6 +118,7 @@ void twi_write(uint8_t d) {
 }
 
 
+#ifdef DEBUG
 int uart_putchar(char c, FILE *unused)
 {
 	if (c == '\n') {
@@ -127,17 +129,18 @@ int uart_putchar(char c, FILE *unused)
 	return 0;
 }
 
-
 FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
+#endif
 
 
 int main(void)
 {
   ioinit();
 
+#ifdef DEBUG
   stdout = &mystdout;
-
   printf("Altec Lansing ACS295\n");
+#endif
 
   // See the datasheet for TDA7433 for details on the following values
 
@@ -187,6 +190,9 @@ int main(void)
   twi_stop();
 */
 
+#ifdef DEBUG
   printf("Done\n");
+#endif
+
   return 0;
 }
