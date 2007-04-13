@@ -1,5 +1,9 @@
 # By Lars Englund 2007
 # lars . englund at gmail . com
+# Controls a ACS295 subwoofer, see project page for more information:
+# http://code.google.com/p/acs295/
+#
+# $Id$
 
 all:			clean twitest show_size twitest_hex
 
