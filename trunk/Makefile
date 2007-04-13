@@ -9,7 +9,7 @@ all:			clean twitest show_size twitest_hex
 
 
 CC = avr-gcc
-CCFLAGS = -Os -mmcu=atmega8 -DF_CPU=8000000UL -DF_OSC=8000000
+CCFLAGS = -Os -mmcu=atmega8 -DF_CPU=8000000UL -DF_OSC=8000000 -DDEBUG=1 -Wall
 OBJCOPY = avr-objcopy
 PROGRAMMER = avrdude
 PROGRAMMERFLAGS = -p m8 -P com9 -c avrispv2 -V -U
