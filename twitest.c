@@ -135,6 +135,8 @@ FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
 
 int main(void)
 {
+	uint8_t n;
+
   ioinit();
 
 #ifdef DEBUG
@@ -142,8 +144,11 @@ int main(void)
   printf("Altec Lansing ACS295\n");
 #endif
 
-  // See the datasheet for TDA7433 for details on the following values
+	for (n=0; n<200; n++)
+		_delay_ms(10);
 
+  // See the datasheet for TDA7433 for details on the following values
+	for(;;) {
   twi_start();
   twi_write(0x8a);
   twi_write(0x00);	// select input
@@ -162,7 +167,7 @@ int main(void)
   twi_write(0x8f);
   twi_stop();
 
- /*
+ 
   twi_start();
   twi_write(0x8a);
   twi_write(0x04);	// set atten LR
@@ -174,7 +179,7 @@ int main(void)
   twi_write(0x06);	// set atten RR
   twi_write(0x00);
   twi_stop();
-*/
+	}
 
 /*
   twi_start();
